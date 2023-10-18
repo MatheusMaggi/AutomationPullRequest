@@ -1,15 +1,29 @@
- name:
+name:
 
  on:
 
-  push:
+push:
     branches-ignore:
     - master
 
 jobs:
-  autoPullRequest
-    name: createPullRequest:
+  auto-pull-request: 
+    name: createPullRequest
     runs-on: windows-latest
-    steps:
+
+steps:
     - name: Extract Branch Name
-  
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extractBranch
+    
+      - name: pull-request-action
+      uses: vsoch/pull-request-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH_PREFIX: "update/"
+        PULL_REQUEST_BRANCH: "master"
+        PULL_REQUEST_TITLE: ${{ steps.extractBranch.output.branch }}
+        PULL_REQUEST_DRAFT: true
+        PULL_REQUEST_BODY: true
+
