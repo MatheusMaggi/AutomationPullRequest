@@ -1,4 +1,4 @@
-name:
+name: Auto Pull Request
 
 on:
   push:
@@ -6,23 +6,26 @@ on:
       - master
 
 jobs:
-  auto-pull-request:
-    name: createPullRequest
-    runs-on: windows-latest
+  criarPullRequest:
+    name: Criar Pull Request
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Extract Branch Name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extractBranch
+    - name: Checkout no Pull Request
+      uses: actions/checkout@v2
 
-    - name: pull-request-action
-      uses: vsoch/pull-request-action@master
-      needs: Extract Branch Name
+    - name: Extrair o Nome da Branche
+      shell: bash
+      id: extrairBranch
+      run: echo "::set-output name=branch::${{ github.ref }}"
+    
+    - name: Criar Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        branch: update/${{ steps.extrairBranch.outputs.branch }}
+        title: Atualizar ${{ steps.extrairBranch.outputs.branch }}
+        draft: true
+        body: |
+          Este é um pull request automatizado para teste.          
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH_PREFIX: "update/"
-        PULL_REQUEST_BRANCH: "update/$(echo ${GITHUB_REF#refs/heads/})"
-        PULL_REQUEST_TITLE: ${{ steps.extractBranch.output.branch }}
-        PULL_REQUEST_DRAFT: true
-        PULL_REQUEST_BODY: true
