@@ -26,6 +26,6 @@ jobs:
         title: Atualizar ${{ steps.extrairBranch.outputs.branch }}
         draft: true
         body: |
-          Este é um pull request automatizado para teste.          
+          pr test          
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
